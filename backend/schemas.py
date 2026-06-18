@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+# ChatRequest 모델 설계
 class ChatRequest(BaseModel):
     message: str = Field(..., description="사용자가 입력한 질문")
     model: str = Field(default="llama3.2:3b", description="Ollama 모델명")
@@ -11,6 +12,7 @@ class ChatRequest(BaseModel):
     top_p: float = Field(default=0.9, ge=0.0, le=1.0)
     num_predict: int = Field(default=256, ge=1, le=2048)
 
+# ChatResponse 모델 설계
 class ChatResponse(BaseModel):
     model: str
     message: str
