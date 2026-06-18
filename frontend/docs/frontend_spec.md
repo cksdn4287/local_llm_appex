@@ -49,13 +49,22 @@ Ollama
   ↓
 Local Language Model
 
-# 4. React 컴포넌트 구조
-App
-  └─ ChatWindow
-      ├─ SettingsPanel
-      ├─ MessageList
-      │   └─ MessageBubble
-      └─ ChatInput
+# 4. 프론트엔드, React 컴포넌트 구조
+
+src/
+├── api/
+│   └── chatApi.js          # API 호출 로직
+├── components/
+│   ├── ChatWindow.jsx      # 메인 채팅 윈도우
+│   ├── SettingsPanel.jsx   # 모델 선택 패널
+│   ├── MessageList.jsx     # 메시지 목록
+│   ├── MessageBubble.jsx   # 개별 메시지
+│   └── ChatInput.jsx       # 입력 필드
+├── App.jsx                 # 앱 진입점
+├── main.jsx                # React 렌더링
+├── App.css                 # 앱 스타일
+└── index.css               # 전역 스타일
+
       
 # 5. 환경변수의 파일
 .env
@@ -66,3 +75,9 @@ backend/
 # 7. 서버의 API
 - local llm 모델명 가져오기 API : /models
 - chat API : /chat
+
+# 8. Context7 MCP 사용 지침
+본 프로젝트의 코드 생성, 리팩터링, 오류 수정, 라이브러리 사용법 확인 시 VS Code MCP Servers에 설치된 Context7 MCP를 사용한다.
+다음 라이브러리 또는 프레임워크를 사용할 때는 반드시 Context7 MCP로 최신 공식 문서와 코드 예제를 확인한 뒤 구현한다.
+-	FastAPI, React, Vite, LangChain, Ollama
+

@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
 import { fetchModels, sendChatRequest } from './api/chatApi'
 import SettingsPanel from './components/SettingsPanel'
-import MessageList from './components/MessageList'
-import ChatInput from './components/ChatInput'
+import ChatWindow from './components/ChatWindow'
+import { promptModes } from './api/promptModels'
 import './App.css'
 
 function App() {
   const [models, setModels] = useState([])
   const [selectedModel, setSelectedModel] = useState('')
-  const [systemPrompt, setSystemPrompt] = useState(
-    '너는 초보자를 돕는 AI 강사다. 답변은 명확하고 간결하게 작성한다.'
-  )
+  const [systemPrompt, setSystemPrompt] = useState(promptModes.basic.prompt)
   const [temperature, setTemperature] = useState(0.7)
   const [topP, setTopP] = useState(0.9)
   const [numPredict, setNumPredict] = useState(256)
@@ -29,7 +27,9 @@ function App() {
         }
       } catch (err) {
         console.error(err)
-        setError('모델 목록을 가져오는 중 오류가 발생했습니다.')
+        setError(
+          '모델 목록을 가져오는 중 오류가 발생했습니다. FastAPI 서버와 Ollama 상태를 확인하세요.'
+        )
       }
     }
 
@@ -39,6 +39,11 @@ function App() {
   const handleSend = async () => {
     if (!message.trim()) {
       alert('질문을 입력하세요.')
+      return
+    }
+
+    if (!selectedModel) {
+      setError('사용할 모델을 선택할 수 없습니다. /models API 응답을 확인하세요.')
       return
     }
 
@@ -59,7 +64,12 @@ function App() {
       })
       setMessages((prev) => [
         ...prev,
-        { sender: 'assistant', content: response.message },
+        {
+          sender: 'assistant',
+          content: response.message || '응답 메시지가 비어 있습니다.',
+          model: response.model,
+          elapsedTime: response.elapsed_time,
+        },
       ])
     } catch (err) {
       console.error(err)
@@ -109,28 +119,15 @@ function App() {
             </button>
           </header>
 
-          <div className="chat-window">
-            <div className="chat-box">
-              {messages.length === 0 ? (
-                <div className="empty-chat-placeholder">
-                  첫 질문을 입력하고 전송하면 AI가 답변합니다.
-                </div>
-              ) : (
-                <MessageList messages={messages} />
-              )}
-            </div>
-            <div className="status-bar">
-              <span>선택 모델: {selectedModel || '불러오는 중...'}</span>
-              <span>{isLoading ? '응답 생성 중...' : 'FastAPI /chat API와 연결됨'}</span>
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            <ChatInput
-              message={message}
-              onChange={setMessage}
-              onSubmit={handleSend}
-              isLoading={isLoading}
-            />
-          </div>
+          <ChatWindow
+            messages={messages}
+            message={message}
+            onMessageChange={setMessage}
+            onSend={handleSend}
+            isLoading={isLoading}
+            error={error}
+            selectedModel={selectedModel}
+          />
         </main>
       </div>
     </div>

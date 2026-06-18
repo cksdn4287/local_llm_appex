@@ -1,12 +1,65 @@
-function SettingsPanel({ models, selectedModel, onModelChange, systemPrompt, onSystemPromptChange, temperature, onTemperatureChange, topP, onTopPChange, numPredict, onNumPredictChange, onReset }) {
+import { useState } from 'react'
+import { promptModes } from '../api/promptModels'
+
+function SettingsPanel({
+  models,
+  selectedModel,
+  onModelChange,
+  systemPrompt,
+  onSystemPromptChange,
+  temperature,
+  onTemperatureChange,
+  topP,
+  onTopPChange,
+  numPredict,
+  onNumPredictChange,
+  onReset,
+}) {
+  const [promptMode, setPromptMode] = useState('basic')
+
+  const handlePromptModeChange = (event) => {
+    const modeKey = event.target.value
+    const selectedMode = promptModes[modeKey]
+
+    if (!selectedMode) {
+      return
+    }
+
+    setPromptMode(modeKey)
+    onSystemPromptChange(selectedMode.prompt)
+  }
+
   return (
     <div className="settings-panel">
       <label>
         모델
-        <select value={selectedModel} onChange={(event) => onModelChange(event.target.value)}>
-          {models.map((model) => (
-            <option key={model} value={model}>
-              {model}
+        <select
+          value={selectedModel}
+          onChange={(event) => onModelChange(event.target.value)}
+          disabled={models.length === 0}
+        >
+          {models.length === 0 ? (
+            <option value="">모델을 불러오는 중...</option>
+          ) : (
+            models.map((model) => (
+              <option key={model} value={model}>
+                {model}
+              </option>
+            ))
+          )}
+        </select>
+      </label>
+      <label>
+        프롬프트 모드
+        <select
+          id="prompt-mode-select"
+          name="prompt_mode"
+          value={promptMode}
+          onChange={handlePromptModeChange}
+        >
+          {Object.entries(promptModes).map(([key, mode]) => (
+            <option key={key} value={key}>
+              {mode.label}
             </option>
           ))}
         </select>
@@ -56,7 +109,7 @@ function SettingsPanel({ models, selectedModel, onModelChange, systemPrompt, onS
         대화 초기화
       </button>
     </div>
-  );
+  )
 }
 
-export default SettingsPanel;
+export default SettingsPanel
